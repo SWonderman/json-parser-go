@@ -27,6 +27,17 @@ func (l *Lexer) readChar() {
 	l.position += 1
 }
 
+func (l *Lexer) readJsonString() string {
+	l.readChar()
+	startPosition := l.position
+	for l.currentChar != '"' {
+		l.readChar()
+	}
+	endPosition := l.position
+
+	return l.input[startPosition-1 : endPosition-1]
+}
+
 func (l *Lexer) ReadToken() token.Token {
 	var newToken token.Token
 
@@ -43,6 +54,8 @@ func (l *Lexer) ReadToken() token.Token {
 		newToken = *token.New(token.LSQUARE_BRACE, string(l.currentChar))
 	case ']':
 		newToken = *token.New(token.RSQUARE_BRACE, string(l.currentChar))
+	case '"':
+		newToken = *token.New(token.STRING, l.readJsonString())
 	case 0:
 		newToken = *token.New(token.EoF, "")
 	}
