@@ -60,10 +60,25 @@ func (l *Lexer) readKeyword() string {
 	return l.input[startPos-1 : endPos-1]
 }
 
+func (l *Lexer) readNumber() string {
+	startPos := l.position
+	// NOTE: this will also read and tokenize faulty 'numbers', like: 1.1.1
+	for l.isCharDigit() || l.currentChar == '.' {
+		l.readChar()
+	}
+	endPos := l.position
+
+	return l.input[startPos-1 : endPos-1]
+}
+
 func (l *Lexer) isCharLetter() bool {
 	ch := l.currentChar
 
 	return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ch == '_'
+}
+
+func (l *Lexer) isCharDigit() bool {
+	return '0' <= l.currentChar && '9' >= l.currentChar
 }
 
 func (l *Lexer) ReadToken() token.Token {
@@ -89,13 +104,19 @@ func (l *Lexer) ReadToken() token.Token {
 	case 0:
 		newToken = *token.New(token.EoF, "")
 	default:
-		// parse keywords
 		if l.isCharLetter() {
 			keyword := l.readKeyword()
 			newToken = *token.New(token.LookupKeyword(keyword), keyword)
 
 			return newToken
+		} else if l.isCharDigit() {
+			digit := l.readNumber()
+			newToken = *token.New(token.NUMBER, digit)
+
+			return newToken
 		}
+
+		newToken = *token.New(token.INVALID, string(l.currentChar))
 	}
 
 	l.readChar()
