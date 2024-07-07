@@ -1,6 +1,8 @@
 package lexer
 
 import (
+	"slices"
+
 	"sw/json-parser/token"
 )
 
@@ -38,8 +40,20 @@ func (l *Lexer) readJsonString() string {
 	return l.input[startPosition-1 : endPosition-1]
 }
 
+func (l *Lexer) eatWhitespace() {
+	character := l.currentChar
+	whitespaceChars := []byte{' ', '\t', '\n', '\r', '\v', '\f'}
+
+	for slices.Contains(whitespaceChars, character) {
+		l.readChar()
+		character = l.currentChar
+	}
+}
+
 func (l *Lexer) ReadToken() token.Token {
 	var newToken token.Token
+
+	l.eatWhitespace()
 
 	switch l.currentChar {
 	case ',':
