@@ -50,6 +50,22 @@ func (l *Lexer) eatWhitespace() {
 	}
 }
 
+func (l *Lexer) readKeyword() string {
+	startPos := l.position
+	for l.isCharLetter() {
+		l.readChar()
+	}
+	endPos := l.position
+
+	return l.input[startPos-1 : endPos-1]
+}
+
+func (l *Lexer) isCharLetter() bool {
+	ch := l.currentChar
+
+	return ('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ch == '_'
+}
+
 func (l *Lexer) ReadToken() token.Token {
 	var newToken token.Token
 
@@ -72,6 +88,14 @@ func (l *Lexer) ReadToken() token.Token {
 		newToken = *token.New(token.STRING, l.readJsonString())
 	case 0:
 		newToken = *token.New(token.EoF, "")
+	default:
+		// parse keywords
+		if l.isCharLetter() {
+			keyword := l.readKeyword()
+			newToken = *token.New(token.LookupKeyword(keyword), keyword)
+
+			return newToken
+		}
 	}
 
 	l.readChar()

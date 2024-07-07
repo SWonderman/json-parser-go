@@ -93,3 +93,40 @@ func TestLexerOmitWhitespace(t *testing.T) {
 		}
 	}
 }
+
+func TestLexerTokenizesKeywords(t *testing.T) {
+	input := `{"isBold": false, "likesProgramming": true, "hasKids": null}`
+
+	expected := []struct {
+		expectedType    token.TokenType
+		expectedLiteral string
+	}{
+		{token.LBRACE, "{"},
+		{token.STRING, "isBold"},
+		{token.COLON, ":"},
+		{token.FALSE, "false"},
+		{token.COMMA, ","},
+		{token.STRING, "likesProgramming"},
+		{token.COLON, ":"},
+		{token.TRUE, "true"},
+		{token.COMMA, ","},
+		{token.STRING, "hasKids"},
+		{token.COLON, ":"},
+		{token.NULL, "null"},
+		{token.RBRACE, "}"},
+	}
+
+	lexer := New(input)
+
+	for i, exp := range expected {
+		token := lexer.ReadToken()
+
+		if token.Type != exp.expectedType {
+			t.Fatalf("tests[%d] - tokentype is wrong. Expected=%q, but got=%q", i, exp.expectedType, token.Type)
+		}
+
+		if token.Literal != exp.expectedLiteral {
+			t.Fatalf("tests[%d] - literal is wrong. Expected=%q, but got=%q", i, exp.expectedLiteral, token.Literal)
+		}
+	}
+}

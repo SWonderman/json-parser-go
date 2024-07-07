@@ -14,7 +14,8 @@ func New(tokenType TokenType, literal string) *Token {
 }
 
 const (
-	EoF = "EOF"
+	INVALID = "INVALID"
+	EoF     = "EOF"
 
 	STRING = "STRING"
 	NUMBER = "NUMBER"
@@ -31,3 +32,19 @@ const (
 	FALSE = "FALSE"
 	NULL  = "NULL"
 )
+
+var keywords = map[string]TokenType{
+	"true":  TRUE,
+	"false": FALSE,
+	"null":  NULL,
+}
+
+func LookupKeyword(keyword string) TokenType {
+	value, wasFound := keywords[keyword]
+
+	if wasFound == false {
+		return INVALID
+	}
+
+	return value
+}
