@@ -95,3 +95,32 @@ func TestParserSimpleIntOnlyObject(t *testing.T) {
 		}
 	}
 }
+
+func TestParserSimpleStringArray(t *testing.T) {
+	input := `{"colors": ["blue", "red", "green"]}`
+
+	lexer := lexer.New(input)
+	parser := New(lexer)
+
+	parsed, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("Parser returned an error. Error: %q", err)
+	}
+
+	expectedMap := map[string][]string{
+		"colors": []string{"blue", "red", "green"},
+	}
+
+	for key, value := range expectedMap {
+		colors := value
+		parsedColors := parsed[key]
+
+		if slice, ok := parsedColors.([]string); ok {
+			for idx, color := range colors {
+				if color != slice[idx] {
+					t.Fatalf("Parsed value in the array does not match with what is expected. Got %q, but expected %q", slice[idx], color)
+				}
+			}
+		}
+	}
+}

@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 
 	"sw/json-parser/lexer"
@@ -27,6 +26,7 @@ func (parser *Parser) nextToken() {
 }
 
 func (parser *Parser) Parse() (map[string]any, error) {
+	// TODO: check if the first token is '{'
 	return parser.parseObject()
 }
 
@@ -34,6 +34,8 @@ func (parser *Parser) parseJson() (any, error) {
 	switch parser.currentToken.Type {
 	case token.LBRACE:
 		return parser.parseObject()
+	case token.LSQUARE_BRACE:
+		return parser.parseArray()
 	case token.STRING:
 		return parser.parseString()
 	case token.NUMBER:
@@ -43,8 +45,30 @@ func (parser *Parser) parseJson() (any, error) {
 	}
 }
 
-func (parser *Parser) parseArray() {
-	// TODO:
+func (parser *Parser) parseArray() ([]any, error) {
+	jsonArr := []any{}
+
+	// consume '['
+	parser.nextToken()
+
+	for parser.currentToken.Type != token.RSQUARE_BRACE {
+		parsedJson, err := parser.parseJson()
+		if err != nil {
+			return nil, err
+		}
+
+		jsonArr = append(jsonArr, parsedJson)
+
+		// consume array value
+		parser.nextToken()
+
+		if parser.currentToken.Type != token.RSQUARE_BRACE {
+			// consume ',' if we are not at the end of the object
+			parser.nextToken()
+		}
+	}
+
+	return jsonArr, nil
 }
 
 func (parser *Parser) parseObject() (map[string]any, error) {
@@ -54,8 +78,6 @@ func (parser *Parser) parseObject() (map[string]any, error) {
 	parser.nextToken()
 
 	for parser.currentToken.Type != token.RBRACE {
-		fmt.Println("Parser current token: " + parser.currentToken.Literal)
-
 		if parser.currentToken.Type != token.STRING {
 			return nil, errors.New("Key has to be of type string, got: " + string(parser.currentToken.Type))
 		}
@@ -92,9 +114,7 @@ func (parser *Parser) parseObject() (map[string]any, error) {
 }
 
 func (parser *Parser) parseString() (string, error) {
-	parsed := parser.currentToken.Literal
-
-	return parsed, nil
+	return parser.currentToken.Literal, nil
 }
 
 func (parser *Parser) parseNumber() (int, error) {
