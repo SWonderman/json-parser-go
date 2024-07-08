@@ -148,3 +148,50 @@ func TestParserKeywords(t *testing.T) {
 		}
 	}
 }
+
+func TestParserSimpleObject(t *testing.T) {
+	input := `{"name": "Joe", "age": 88, "colors": ["blue", "green", "red"], "hasKids": false, "hasJob": true, "ownsCar": null}`
+
+	lexer := lexer.New(input)
+	parser := New(lexer)
+
+	parsed, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("Parser returned an error. Error: %q", err)
+	}
+
+	expectedMap := map[string]any{
+		"name":    "Joe",
+		"age":     88,
+		"colors":  []string{"blue", "green", "red"},
+		"hasKids": false,
+		"hasJob":  true,
+		"ownsCar": nil,
+	}
+
+	for key, value := range expectedMap {
+		if _, ok := parsed[key].([]any); ok {
+			// skip checking values that are arrays
+		} else {
+			if parsed[key] != value {
+				t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parsed[key])
+			}
+		}
+	}
+
+	parsedColors, ok := parsed["colors"].([]any)
+	if ok == false {
+		t.Fatalf("Colors array was not parsed and is missing in the output")
+	}
+
+	expectedColors, ok := expectedMap["colors"].([]string)
+	if ok == false {
+		t.Fatalf("This will not happen...")
+	}
+
+	for idx, color := range expectedColors {
+		if color != parsedColors[idx] {
+			t.Fatalf("Parsed colors do not match. Expected %q, but got %q", color, parsedColors[idx])
+		}
+	}
+}
