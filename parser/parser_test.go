@@ -195,3 +195,51 @@ func TestParserSimpleObject(t *testing.T) {
 		}
 	}
 }
+
+func TestParserArrayOfObjects(t *testing.T) {
+	input := `{"orders": [{"id": 12, "article": "book"}, {"id": 13, "article": "ball"}]}`
+
+	lexer := lexer.New(input)
+	parser := New(lexer)
+
+	parsed, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("Parser returned an error. Error: %q", err)
+	}
+
+	expectedMap := map[string]any{
+		"orders": []map[string]any{
+			{
+				"id":      12,
+				"article": "book",
+			},
+			{
+				"id":      13,
+				"article": "ball",
+			},
+		},
+	}
+
+	parsedOrders, ok := parsed["orders"].([]any)
+	if ok == false {
+		t.Fatalf("Orders data was not parsed")
+	}
+
+	expectedOrders, ok := expectedMap["orders"].([]map[string]any)
+	if ok == false {
+		t.Fatalf("This will not happen...")
+	}
+
+	for idx, expected := range expectedOrders {
+		parsedOrder, ok := parsedOrders[idx].(map[string]any)
+		if ok == false {
+			t.Fatalf("Parsed order is not a map")
+		}
+
+		for key, value := range expected {
+			if parsedOrder[key] != value {
+				t.Fatalf("Parsed nested object does not match with the expected object.")
+			}
+		}
+	}
+}
