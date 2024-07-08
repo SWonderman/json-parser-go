@@ -40,6 +40,12 @@ func (parser *Parser) parseJson() (any, error) {
 		return parser.parseString()
 	case token.NUMBER:
 		return parser.parseNumber()
+	case token.FALSE:
+		return false, nil
+	case token.TRUE:
+		return true, nil
+	case token.NULL:
+		return nil, nil
 	default:
 		return nil, errors.New("Unknown current token with type: " + string(parser.currentToken.Type) + " and value: " + string(parser.currentToken.Literal))
 	}

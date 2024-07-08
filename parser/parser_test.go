@@ -124,3 +124,27 @@ func TestParserSimpleStringArray(t *testing.T) {
 		}
 	}
 }
+
+func TestParserKeywords(t *testing.T) {
+	input := `{"hasKids": false, "hasJob": true, "ownsCar": null}`
+
+	lexer := lexer.New(input)
+	parser := New(lexer)
+
+	parsed, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("Parser returned an error. Error: %q", err)
+	}
+
+	expectedMap := map[string]any{
+		"hasKids": false,
+		"hasJob":  true,
+		"ownsCar": nil,
+	}
+
+	for key, value := range expectedMap {
+		if parsed[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parsed[key])
+		}
+	}
+}
