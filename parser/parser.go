@@ -11,7 +11,7 @@ import (
 type Parser struct {
 	lexer        *lexer.Lexer
 	currentToken token.Token
-    peekToken token.Token
+	peekToken    token.Token
 }
 
 func New(lexer *lexer.Lexer) *Parser {
@@ -24,7 +24,7 @@ func New(lexer *lexer.Lexer) *Parser {
 }
 
 func (parser *Parser) nextToken() {
-	parser.currentToken = parser.peekToken 
+	parser.currentToken = parser.peekToken
 	parser.peekToken = parser.lexer.ReadToken()
 }
 
@@ -50,10 +50,10 @@ func (parser *Parser) parseJson() (any, error) {
 	case token.NULL:
 		return nil, nil
 	default:
-        // Handle negative numbers
-        if parser.currentToken.Type == token.MINUS && parser.peekExpected(token.NUMBER) {
-            return parser.parseNegativeNumber()
-        }
+		// Handle negative numbers
+		if parser.currentToken.Type == token.MINUS && parser.peekExpected(token.NUMBER) {
+			return parser.parseNegativeNumber()
+		}
 
 		return nil, errors.New("Unknown current token with type: " + string(parser.currentToken.Type) + " and value: " + string(parser.currentToken.Literal))
 	}
@@ -132,47 +132,47 @@ func (parser *Parser) parseString() (string, error) {
 }
 
 func (parser *Parser) parseNegativeNumber() (interface{}, error) {
-    // consume '-'
-    parser.nextToken()
+	// consume '-'
+	parser.nextToken()
 
-    parsedValue, error := parser.parseNumber()
-    if error != nil {
-        return nil, error
-    }
+	parsedValue, error := parser.parseNumber()
+	if error != nil {
+		return nil, error
+	}
 
-    switch val := parsedValue.(type) {
-    case int:
-        return -val, nil
-    case float64:
-        return -val, nil
-    }
+	switch val := parsedValue.(type) {
+	case int:
+		return -val, nil
+	case float64:
+		return -val, nil
+	}
 
-    return nil, errors.New("It was not possible to parse a negative number")
+	return nil, errors.New("It was not possible to parse a negative number")
 }
 
 func (parser *Parser) parseNumber() (interface{}, error) {
-    // Try to parse the current token literal as an int first, if that fails,
-    // try to parse it as a float.
+	// Try to parse the current token literal as an int first, if that fails,
+	// try to parse it as a float.
 
-    literal := parser.currentToken.Literal
+	literal := parser.currentToken.Literal
 
-    parsedInt, error := strconv.Atoi(literal)
-    if error == nil {
-        return parsedInt, nil
-    }
+	parsedInt, error := strconv.Atoi(literal)
+	if error == nil {
+		return parsedInt, nil
+	}
 
-    parsedFloat, error := strconv.ParseFloat(literal, 64)
-    if error == nil {
-        return parsedFloat, nil
-    }
+	parsedFloat, error := strconv.ParseFloat(literal, 64)
+	if error == nil {
+		return parsedFloat, nil
+	}
 
-    return nil, errors.New("It was not possible to parse the current token literal as either int or float")
+	return nil, errors.New("It was not possible to parse the current token literal as either int or float")
 }
 
 func (parser *Parser) peekExpected(expectedToken token.TokenType) bool {
-    if (parser.peekToken.Type == expectedToken) {
-        return true
-    }
+	if parser.peekToken.Type == expectedToken {
+		return true
+	}
 
-    return false
+	return false
 }

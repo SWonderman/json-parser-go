@@ -132,7 +132,7 @@ func TestLexerTokenizesKeywords(t *testing.T) {
 }
 
 func TestLexerTokenizesNumbers(t *testing.T) {
-    input := `{"name": "Joe", "age": 77, "salary": 123.123, "cars": -1}`
+	input := `{"name": "Joe", "age": 77, "salary": 123.123, "cars": -1}`
 
 	expected := []struct {
 		expectedType    token.TokenType
