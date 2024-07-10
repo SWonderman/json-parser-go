@@ -91,6 +91,8 @@ func (l *Lexer) ReadToken() token.Token {
 		newToken = *token.New(token.COMMA, string(l.currentChar))
 	case ':':
 		newToken = *token.New(token.COLON, string(l.currentChar))
+	case '-':
+		newToken = *token.New(token.MINUS, string(l.currentChar))
 	case '{':
 		newToken = *token.New(token.LBRACE, string(l.currentChar))
 	case '}':

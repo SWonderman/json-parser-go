@@ -50,6 +50,28 @@ func TestParserSimpleInt(t *testing.T) {
 	}
 }
 
+func TestParserNegativeInt(t *testing.T) {
+	input := `{"age": -88}`
+
+	lexer := lexer.New(input)
+	parser := New(lexer)
+
+	parsed, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("Parser returned an error. Error: %q", err)
+	}
+
+	expectedMap := map[string]int{
+		"age": -88,
+	}
+
+	for key, value := range expectedMap {
+		if parsed[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%d, but got %q->%d", key, value, key, parsed[key])
+		}
+	}
+}
+
 func TestParserSimpleFloat(t *testing.T) {
 	input := `{"salary": 99.78}`
 

@@ -22,6 +22,7 @@ const (
 
 	COMMA = ","
 	COLON = ":"
+    MINUS = "-"
 
 	LBRACE        = "{"
 	RBRACE        = "}"

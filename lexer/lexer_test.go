@@ -132,7 +132,7 @@ func TestLexerTokenizesKeywords(t *testing.T) {
 }
 
 func TestLexerTokenizesNumbers(t *testing.T) {
-	input := `{"name": "Joe", "age": 77, "salary": 123.123}`
+    input := `{"name": "Joe", "age": 77, "salary": 123.123, "cars": -1}`
 
 	expected := []struct {
 		expectedType    token.TokenType
@@ -150,6 +150,11 @@ func TestLexerTokenizesNumbers(t *testing.T) {
 		{token.STRING, "salary"},
 		{token.COLON, ":"},
 		{token.NUMBER, "123.123"},
+		{token.COMMA, ","},
+		{token.STRING, "cars"},
+		{token.COLON, ":"},
+		{token.MINUS, "-"},
+		{token.NUMBER, "1"},
 		{token.RBRACE, "}"},
 	}
 

@@ -38,6 +38,8 @@ func (parser *Parser) parseJson() (any, error) {
 		return parser.parseArray()
 	case token.STRING:
 		return parser.parseString()
+    case token.MINUS:
+        return parser.parseNegativeNumber()
 	case token.NUMBER:
 		return parser.parseNumber()
 	case token.FALSE:
@@ -123,6 +125,25 @@ func (parser *Parser) parseString() (string, error) {
 	return parser.currentToken.Literal, nil
 }
 
+func (parser *Parser) parseNegativeNumber() (interface{}, error) {
+    // consume '-'
+    parser.nextToken()
+
+    parsedValue, error := parser.parseNumber()
+    if error != nil {
+        return nil, error
+    }
+
+    switch val := parsedValue.(type) {
+    case int:
+        return -val, nil
+    case float64:
+        return -val, nil
+    }
+
+    return nil, errors.New("It was not possible to parse a negative number")
+}
+
 func (parser *Parser) parseNumber() (interface{}, error) {
     // Try to parse the current token literal as an int first, if that fails,
     // try to parse it as a float.
@@ -140,4 +161,9 @@ func (parser *Parser) parseNumber() (interface{}, error) {
     }
 
     return nil, errors.New("It was not possible to parse the current token literal as either int or float")
+}
+
+func (parser *Parser) peekExpected(_expectedToken token.TokenType) bool {
+    // TODO: impl
+    return false;
 }
