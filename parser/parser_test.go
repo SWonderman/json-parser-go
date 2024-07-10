@@ -28,7 +28,7 @@ func TestParserSimpleString(t *testing.T) {
 	}
 }
 
-func TestParserSimpleNumber(t *testing.T) {
+func TestParserSimpleInt(t *testing.T) {
 	input := `{"age": 88}`
 
 	lexer := lexer.New(input)
@@ -46,6 +46,28 @@ func TestParserSimpleNumber(t *testing.T) {
 	for key, value := range expectedMap {
 		if parsed[key] != value {
 			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%d, but got %q->%d", key, value, key, parsed[key])
+		}
+	}
+}
+
+func TestParserSimpleFloat(t *testing.T) {
+	input := `{"salary": 99.78}`
+
+	lexer := lexer.New(input)
+	parser := New(lexer)
+
+	parsed, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("Parser returned an error. Error: %q", err)
+	}
+
+	expectedMap := map[string]float64{
+		"salary": 99.78,
+	}
+
+	for key, value := range expectedMap {
+		if parsed[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%f, but got %q->%f", key, value, key, parsed[key])
 		}
 	}
 }
@@ -150,7 +172,7 @@ func TestParserKeywords(t *testing.T) {
 }
 
 func TestParserSimpleObject(t *testing.T) {
-	input := `{"name": "Joe", "age": 88, "colors": ["blue", "green", "red"], "hasKids": false, "hasJob": true, "ownsCar": null}`
+	input := `{"name": "Joe", "age": 88, "salary": 99.78, "colors": ["blue", "green", "red"], "hasKids": false, "hasJob": true, "ownsCar": null}`
 
 	lexer := lexer.New(input)
 	parser := New(lexer)
@@ -163,6 +185,7 @@ func TestParserSimpleObject(t *testing.T) {
 	expectedMap := map[string]any{
 		"name":    "Joe",
 		"age":     88,
+		"salary":  99.78,
 		"colors":  []string{"blue", "green", "red"},
 		"hasKids": false,
 		"hasJob":  true,

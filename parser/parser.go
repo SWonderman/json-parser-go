@@ -123,7 +123,21 @@ func (parser *Parser) parseString() (string, error) {
 	return parser.currentToken.Literal, nil
 }
 
-func (parser *Parser) parseNumber() (int, error) {
-	// TODO: make it work with floats
-	return strconv.Atoi(parser.currentToken.Literal)
+func (parser *Parser) parseNumber() (interface{}, error) {
+    // Try to parse the current token literal as an int first, if that fails,
+    // try to parse it as a float.
+
+    literal := parser.currentToken.Literal
+
+    parsedInt, error := strconv.Atoi(literal)
+    if error == nil {
+        return parsedInt, nil
+    }
+
+    parsedFloat, error := strconv.ParseFloat(literal, 64)
+    if error == nil {
+        return parsedFloat, nil
+    }
+
+    return nil, errors.New("It was not possible to parse the current token literal as either int or float")
 }
