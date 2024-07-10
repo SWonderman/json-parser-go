@@ -11,18 +11,21 @@ import (
 type Parser struct {
 	lexer        *lexer.Lexer
 	currentToken token.Token
+    peekToken token.Token
 }
 
 func New(lexer *lexer.Lexer) *Parser {
 	parser := Parser{lexer: lexer}
 
 	parser.nextToken()
+	parser.nextToken()
 
 	return &parser
 }
 
 func (parser *Parser) nextToken() {
-	parser.currentToken = parser.lexer.ReadToken()
+	parser.currentToken = parser.peekToken 
+	parser.peekToken = parser.lexer.ReadToken()
 }
 
 func (parser *Parser) Parse() (map[string]any, error) {
@@ -38,8 +41,6 @@ func (parser *Parser) parseJson() (any, error) {
 		return parser.parseArray()
 	case token.STRING:
 		return parser.parseString()
-    case token.MINUS:
-        return parser.parseNegativeNumber()
 	case token.NUMBER:
 		return parser.parseNumber()
 	case token.FALSE:
@@ -49,6 +50,11 @@ func (parser *Parser) parseJson() (any, error) {
 	case token.NULL:
 		return nil, nil
 	default:
+        // Handle negative numbers
+        if parser.currentToken.Type == token.MINUS && parser.peekExpected(token.NUMBER) {
+            return parser.parseNegativeNumber()
+        }
+
 		return nil, errors.New("Unknown current token with type: " + string(parser.currentToken.Type) + " and value: " + string(parser.currentToken.Literal))
 	}
 }
@@ -163,7 +169,10 @@ func (parser *Parser) parseNumber() (interface{}, error) {
     return nil, errors.New("It was not possible to parse the current token literal as either int or float")
 }
 
-func (parser *Parser) peekExpected(_expectedToken token.TokenType) bool {
-    // TODO: impl
-    return false;
+func (parser *Parser) peekExpected(expectedToken token.TokenType) bool {
+    if (parser.peekToken.Type == expectedToken) {
+        return true
+    }
+
+    return false
 }
