@@ -6,7 +6,7 @@ type Token struct {
 	Type    TokenType
 	Literal string
 	Line    int
-	Column int
+	Column  int
 }
 
 func New(tokenType TokenType, literal string, line int, column int) *Token {

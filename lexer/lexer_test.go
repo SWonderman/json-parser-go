@@ -12,8 +12,8 @@ func TestLexerCanTokenizeSymbols(t *testing.T) {
 	expected := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
-        expectedLine int
-        expectedColumn int
+		expectedLine    int
+		expectedColumn  int
 	}{
 		{token.LBRACE, "{", 1, 1},
 		{token.COMMA, ",", 1, 2},
@@ -36,13 +36,13 @@ func TestLexerCanTokenizeSymbols(t *testing.T) {
 			t.Fatalf("tests[%d] - literal is wrong. Expected=%q, but got=%q", i, exp.expectedLiteral, token.Literal)
 		}
 
-        if token.Line != exp.expectedLine {
-            t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
-        }
+		if token.Line != exp.expectedLine {
+			t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
+		}
 
-        if token.Column != exp.expectedColumn {
-            t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
-        }
+		if token.Column != exp.expectedColumn {
+			t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
+		}
 	}
 }
 
@@ -52,8 +52,8 @@ func TestLexerCanTokenizeStrings(t *testing.T) {
 	expected := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
-        expectedLine int
-        expectedColumn int
+		expectedLine    int
+		expectedColumn  int
 	}{
 		{token.LBRACE, "{", 1, 1},
 		{token.STRING, "name", 1, 3},
@@ -75,13 +75,13 @@ func TestLexerCanTokenizeStrings(t *testing.T) {
 			t.Fatalf("tests[%d] - literal is wrong. Expected=%q, but got=%q", i, exp.expectedLiteral, token.Literal)
 		}
 
-        if token.Line != exp.expectedLine {
-            t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
-        }
+		if token.Line != exp.expectedLine {
+			t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
+		}
 
-        if token.Column != exp.expectedColumn {
-            t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
-        }
+		if token.Column != exp.expectedColumn {
+			t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
+		}
 	}
 }
 
@@ -91,11 +91,11 @@ func TestLexerOmitWhitespace(t *testing.T) {
 	expected := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
-        expectedLine int
-        expectedColumn int
+		expectedLine    int
+		expectedColumn  int
 	}{
 		{token.LBRACE, "{", 1, 3},
-		{token.STRING, "name",1 , 6},
+		{token.STRING, "name", 1, 6},
 		{token.COLON, ":", 1, 13},
 		{token.STRING, "Joe", 1, 18},
 		{token.RBRACE, "}", 1, 24},
@@ -114,13 +114,13 @@ func TestLexerOmitWhitespace(t *testing.T) {
 			t.Fatalf("tests[%d] - literal is wrong. Expected=%q, but got=%q", i, exp.expectedLiteral, token.Literal)
 		}
 
-        if token.Line != exp.expectedLine {
-            t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
-        }
+		if token.Line != exp.expectedLine {
+			t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
+		}
 
-        if token.Column != exp.expectedColumn {
-            t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
-        }
+		if token.Column != exp.expectedColumn {
+			t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
+		}
 	}
 }
 
@@ -130,8 +130,8 @@ func TestLexerTokenizesKeywords(t *testing.T) {
 	expected := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
-        expectedLine int
-        expectedColumn int
+		expectedLine    int
+		expectedColumn  int
 	}{
 		{token.LBRACE, "{", 1, 1},
 		{token.STRING, "isBold", 1, 3},
@@ -161,13 +161,13 @@ func TestLexerTokenizesKeywords(t *testing.T) {
 			t.Fatalf("tests[%d] - literal is wrong. Expected=%q, but got=%q", i, exp.expectedLiteral, token.Literal)
 		}
 
-        if token.Line != exp.expectedLine {
-            t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
-        }
+		if token.Line != exp.expectedLine {
+			t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
+		}
 
-        if token.Column != exp.expectedColumn {
-            t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
-        }
+		if token.Column != exp.expectedColumn {
+			t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
+		}
 	}
 }
 
@@ -177,14 +177,14 @@ func TestLexerTokenizesNumbers(t *testing.T) {
 	expected := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
-        expectedLine int
-        expectedColumn int
+		expectedLine    int
+		expectedColumn  int
 	}{
 		{token.LBRACE, "{", 1, 1},
 		{token.STRING, "name", 1, 3},
 		{token.COLON, ":", 1, 8},
 		{token.STRING, "Joe", 1, 11},
-		{token.COMMA, ",", 1 , 15},
+		{token.COMMA, ",", 1, 15},
 		{token.STRING, "age", 1, 18},
 		{token.COLON, ":", 1, 22},
 		{token.NUMBER, "77", 1, 24},
@@ -213,18 +213,18 @@ func TestLexerTokenizesNumbers(t *testing.T) {
 			t.Fatalf("tests[%d] - literal is wrong. Expected=%q, but got=%q", i, exp.expectedLiteral, token.Literal)
 		}
 
-        if token.Line != exp.expectedLine {
-            t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
-        }
+		if token.Line != exp.expectedLine {
+			t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
+		}
 
-        if token.Column != exp.expectedColumn {
-            t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
-        }
+		if token.Column != exp.expectedColumn {
+			t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
+		}
 	}
 }
 
 func TestLexerContextTracksTokenPosition(t *testing.T) {
-    input := `{
+	input := `{
     "first_name": "Joe",
     "last_name": "Doe"
 }`
@@ -232,14 +232,14 @@ func TestLexerContextTracksTokenPosition(t *testing.T) {
 	expected := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
-        expectedLine int
-        expectedColumn int
+		expectedLine    int
+		expectedColumn  int
 	}{
 		{token.LBRACE, "{", 1, 1},
 		{token.STRING, "first_name", 2, 6},
 		{token.COLON, ":", 2, 17},
 		{token.STRING, "Joe", 2, 20},
-		{token.COMMA, ",", 2 , 24},
+		{token.COMMA, ",", 2, 24},
 		{token.STRING, "last_name", 3, 6},
 		{token.COLON, ":", 3, 16},
 		{token.STRING, "Doe", 3, 19},
@@ -259,12 +259,12 @@ func TestLexerContextTracksTokenPosition(t *testing.T) {
 			t.Fatalf("tests[%d] - literal is wrong. Expected=%q, but got=%q", i, exp.expectedLiteral, token.Literal)
 		}
 
-        if token.Line != exp.expectedLine {
-            t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
-        }
+		if token.Line != exp.expectedLine {
+			t.Fatalf("tests[%d] - line is wrong. Expected=%d, but got=%d", i, exp.expectedLine, token.Line)
+		}
 
-        if token.Column != exp.expectedColumn {
-            t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
-        }
+		if token.Column != exp.expectedColumn {
+			t.Fatalf("tests[%d] - column is wrong. Expected=%d, but got=%d", i, exp.expectedColumn, token.Column)
+		}
 	}
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type ParseContext struct {
-	Line int
+	Line   int
 	Column int
 }
 
@@ -119,21 +119,21 @@ func (l *Lexer) ReadToken() token.Token {
 	case ']':
 		newToken = *token.New(token.RSQUARE_BRACE, string(l.currentChar), l.Context.Line, l.Context.Column)
 	case '"':
-        jsonString := l.readJsonString()
-        beginningColumn := l.Context.Column - len(jsonString)
+		jsonString := l.readJsonString()
+		beginningColumn := l.Context.Column - len(jsonString)
 		newToken = *token.New(token.STRING, jsonString, l.Context.Line, beginningColumn)
 	case 0:
 		newToken = *token.New(token.EoF, "", l.Context.Line, l.Context.Column)
 	default:
 		if l.isCharLetter() {
 			keyword := l.readKeyword()
-            beginningColumn := l.Context.Column - len(keyword)
+			beginningColumn := l.Context.Column - len(keyword)
 			newToken = *token.New(token.LookupKeyword(keyword), keyword, l.Context.Line, beginningColumn)
 
 			return newToken
 		} else if l.isCharDigit() {
 			digit := l.readNumber()
-            beginningColumn := l.Context.Column - len(digit)
+			beginningColumn := l.Context.Column - len(digit)
 			newToken = *token.New(token.NUMBER, digit, l.Context.Line, beginningColumn)
 
 			return newToken
