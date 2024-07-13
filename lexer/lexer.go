@@ -6,14 +6,24 @@ import (
 	"sw/json-parser/token"
 )
 
+type ParseContext struct {
+	Line int
+	Column int
+}
+
+func newParseContext() *ParseContext {
+	return &ParseContext{Line: 1, Column: 0}
+}
+
 type Lexer struct {
 	input       string
 	position    int
 	currentChar byte
+	Context     *ParseContext
 }
 
 func New(input string) *Lexer {
-	l := Lexer{input: input}
+	l := Lexer{input: input, Context: newParseContext()}
 	l.readChar()
 
 	return &l
@@ -26,6 +36,8 @@ func (l *Lexer) readChar() {
 	} else {
 		l.currentChar = l.input[l.position]
 	}
+
+	l.Context.Column += 1
 	l.position += 1
 }
 
@@ -45,6 +57,11 @@ func (l *Lexer) eatWhitespace() {
 	whitespaceChars := []byte{' ', '\t', '\n', '\r', '\v', '\f'}
 
 	for slices.Contains(whitespaceChars, character) {
+		if l.currentChar == '\n' {
+			l.Context.Column = 0
+			l.Context.Line += 1
+		}
+
 		l.readChar()
 		character = l.currentChar
 	}
@@ -88,37 +105,41 @@ func (l *Lexer) ReadToken() token.Token {
 
 	switch l.currentChar {
 	case ',':
-		newToken = *token.New(token.COMMA, string(l.currentChar))
+		newToken = *token.New(token.COMMA, string(l.currentChar), l.Context.Line, l.Context.Column)
 	case ':':
-		newToken = *token.New(token.COLON, string(l.currentChar))
+		newToken = *token.New(token.COLON, string(l.currentChar), l.Context.Line, l.Context.Column)
 	case '-':
-		newToken = *token.New(token.MINUS, string(l.currentChar))
+		newToken = *token.New(token.MINUS, string(l.currentChar), l.Context.Line, l.Context.Column)
 	case '{':
-		newToken = *token.New(token.LBRACE, string(l.currentChar))
+		newToken = *token.New(token.LBRACE, string(l.currentChar), l.Context.Line, l.Context.Column)
 	case '}':
-		newToken = *token.New(token.RBRACE, string(l.currentChar))
+		newToken = *token.New(token.RBRACE, string(l.currentChar), l.Context.Line, l.Context.Column)
 	case '[':
-		newToken = *token.New(token.LSQUARE_BRACE, string(l.currentChar))
+		newToken = *token.New(token.LSQUARE_BRACE, string(l.currentChar), l.Context.Line, l.Context.Column)
 	case ']':
-		newToken = *token.New(token.RSQUARE_BRACE, string(l.currentChar))
+		newToken = *token.New(token.RSQUARE_BRACE, string(l.currentChar), l.Context.Line, l.Context.Column)
 	case '"':
-		newToken = *token.New(token.STRING, l.readJsonString())
+        jsonString := l.readJsonString()
+        beginningColumn := l.Context.Column - len(jsonString)
+		newToken = *token.New(token.STRING, jsonString, l.Context.Line, beginningColumn)
 	case 0:
-		newToken = *token.New(token.EoF, "")
+		newToken = *token.New(token.EoF, "", l.Context.Line, l.Context.Column)
 	default:
 		if l.isCharLetter() {
 			keyword := l.readKeyword()
-			newToken = *token.New(token.LookupKeyword(keyword), keyword)
+            beginningColumn := l.Context.Column - len(keyword)
+			newToken = *token.New(token.LookupKeyword(keyword), keyword, l.Context.Line, beginningColumn)
 
 			return newToken
 		} else if l.isCharDigit() {
 			digit := l.readNumber()
-			newToken = *token.New(token.NUMBER, digit)
+            beginningColumn := l.Context.Column - len(digit)
+			newToken = *token.New(token.NUMBER, digit, l.Context.Line, beginningColumn)
 
 			return newToken
 		}
 
-		newToken = *token.New(token.INVALID, string(l.currentChar))
+		newToken = *token.New(token.INVALID, string(l.currentChar), l.Context.Line, l.Context.Column)
 	}
 
 	l.readChar()

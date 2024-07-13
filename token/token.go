@@ -5,12 +5,12 @@ type TokenType string
 type Token struct {
 	Type    TokenType
 	Literal string
+	Line    int
+	Column int
 }
 
-func New(tokenType TokenType, literal string) *Token {
-	newToken := Token{Type: tokenType, Literal: literal}
-
-	return &newToken
+func New(tokenType TokenType, literal string, line int, column int) *Token {
+	return &Token{Type: tokenType, Literal: literal, Line: line, Column: column}
 }
 
 const (
@@ -22,7 +22,7 @@ const (
 
 	COMMA = ","
 	COLON = ":"
-    MINUS = "-"
+	MINUS = "-"
 
 	LBRACE        = "{"
 	RBRACE        = "}"
