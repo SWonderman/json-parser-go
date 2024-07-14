@@ -1,8 +1,8 @@
 package parser
 
 import (
-    "fmt"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"sw/json-parser/lexer"
@@ -10,16 +10,16 @@ import (
 )
 
 type ParserResult struct {
-    SingleMap map[string]any
-    MapArray []any // TODO: any should be map[string]any instead
+	SingleMap map[string]any
+	MapArray  []any // TODO: any should be map[string]any instead
 }
 
 func (parserResult *ParserResult) IsSingleMap() bool {
-    return parserResult.SingleMap != nil
+	return parserResult.SingleMap != nil
 }
 
 func (parserResult *ParserResult) IsMapArray() bool {
-    return parserResult.MapArray != nil
+	return parserResult.MapArray != nil
 }
 
 type Parser struct {
@@ -43,17 +43,17 @@ func (parser *Parser) nextToken() {
 }
 
 func (parser *Parser) Parse() (*ParserResult, error) {
-    if parser.currentToken.Literal == token.LBRACE {
-        result, error := parser.parseObject()
+	if parser.currentToken.Literal == token.LBRACE {
+		result, error := parser.parseObject()
 
-        return &ParserResult{SingleMap: result}, error
-    } else if parser.currentToken.Type == token.LSQUARE_BRACE {
-        result, error := parser.parseArray()
+		return &ParserResult{SingleMap: result}, error
+	} else if parser.currentToken.Type == token.LSQUARE_BRACE {
+		result, error := parser.parseArray()
 
-        return &ParserResult{MapArray: result}, error
-    }
+		return &ParserResult{MapArray: result}, error
+	}
 
-    return nil, errors.New(fmt.Sprintf("The input has to begin either with '{' or with '['. Found '%s' instead at line: %d and column: %d.", parser.currentToken.Literal, parser.currentToken.Line, parser.currentToken.Column))
+	return nil, errors.New(fmt.Sprintf("The input has to begin either with '{' or with '['. Found '%s' instead at line: %d and column: %d.", parser.currentToken.Literal, parser.currentToken.Line, parser.currentToken.Column))
 }
 
 func (parser *Parser) parseJson() (any, error) {

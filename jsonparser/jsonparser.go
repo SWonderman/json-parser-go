@@ -6,9 +6,8 @@ import (
 )
 
 func Parse(input string) (*parser.ParserResult, error) {
-    lexer := lexer.New(input)
-    parser := parser.New(lexer)
+	lexer := lexer.New(input)
+	parser := parser.New(lexer)
 
-    return parser.Parse()
+	return parser.Parse()
 }
-
