@@ -19,11 +19,11 @@ type Lexer struct {
 	input       string
 	position    int
 	currentChar byte
-	Context     *ParseContext
+	context     *ParseContext
 }
 
 func New(input string) *Lexer {
-	l := Lexer{input: input, Context: newParseContext()}
+	l := Lexer{input: input, context: newParseContext()}
 	l.readChar()
 
 	return &l
@@ -37,7 +37,7 @@ func (l *Lexer) readChar() {
 		l.currentChar = l.input[l.position]
 	}
 
-	l.Context.Column += 1
+	l.context.Column += 1
 	l.position += 1
 }
 
@@ -58,8 +58,8 @@ func (l *Lexer) eatWhitespace() {
 
 	for slices.Contains(whitespaceChars, character) {
 		if l.currentChar == '\n' {
-			l.Context.Column = 0
-			l.Context.Line += 1
+			l.context.Column = 0
+			l.context.Line += 1
 		}
 
 		l.readChar()
@@ -105,41 +105,41 @@ func (l *Lexer) ReadToken() token.Token {
 
 	switch l.currentChar {
 	case ',':
-		newToken = *token.New(token.COMMA, string(l.currentChar), l.Context.Line, l.Context.Column)
+		newToken = *token.New(token.COMMA, string(l.currentChar), l.context.Line, l.context.Column)
 	case ':':
-		newToken = *token.New(token.COLON, string(l.currentChar), l.Context.Line, l.Context.Column)
+		newToken = *token.New(token.COLON, string(l.currentChar), l.context.Line, l.context.Column)
 	case '-':
-		newToken = *token.New(token.MINUS, string(l.currentChar), l.Context.Line, l.Context.Column)
+		newToken = *token.New(token.MINUS, string(l.currentChar), l.context.Line, l.context.Column)
 	case '{':
-		newToken = *token.New(token.LBRACE, string(l.currentChar), l.Context.Line, l.Context.Column)
+		newToken = *token.New(token.LBRACE, string(l.currentChar), l.context.Line, l.context.Column)
 	case '}':
-		newToken = *token.New(token.RBRACE, string(l.currentChar), l.Context.Line, l.Context.Column)
+		newToken = *token.New(token.RBRACE, string(l.currentChar), l.context.Line, l.context.Column)
 	case '[':
-		newToken = *token.New(token.LSQUARE_BRACE, string(l.currentChar), l.Context.Line, l.Context.Column)
+		newToken = *token.New(token.LSQUARE_BRACE, string(l.currentChar), l.context.Line, l.context.Column)
 	case ']':
-		newToken = *token.New(token.RSQUARE_BRACE, string(l.currentChar), l.Context.Line, l.Context.Column)
+		newToken = *token.New(token.RSQUARE_BRACE, string(l.currentChar), l.context.Line, l.context.Column)
 	case '"':
 		jsonString := l.readJsonString()
-		beginningColumn := l.Context.Column - len(jsonString)
-		newToken = *token.New(token.STRING, jsonString, l.Context.Line, beginningColumn)
+		beginningColumn := l.context.Column - len(jsonString)
+		newToken = *token.New(token.STRING, jsonString, l.context.Line, beginningColumn)
 	case 0:
-		newToken = *token.New(token.EoF, "", l.Context.Line, l.Context.Column)
+		newToken = *token.New(token.EoF, "", l.context.Line, l.context.Column)
 	default:
 		if l.isCharLetter() {
 			keyword := l.readKeyword()
-			beginningColumn := l.Context.Column - len(keyword)
-			newToken = *token.New(token.LookupKeyword(keyword), keyword, l.Context.Line, beginningColumn)
+			beginningColumn := l.context.Column - len(keyword)
+			newToken = *token.New(token.LookupKeyword(keyword), keyword, l.context.Line, beginningColumn)
 
 			return newToken
 		} else if l.isCharDigit() {
 			digit := l.readNumber()
-			beginningColumn := l.Context.Column - len(digit)
-			newToken = *token.New(token.NUMBER, digit, l.Context.Line, beginningColumn)
+			beginningColumn := l.context.Column - len(digit)
+			newToken = *token.New(token.NUMBER, digit, l.context.Line, beginningColumn)
 
 			return newToken
 		}
 
-		newToken = *token.New(token.INVALID, string(l.currentChar), l.Context.Line, l.Context.Column)
+		newToken = *token.New(token.INVALID, string(l.currentChar), l.context.Line, l.context.Column)
 	}
 
 	l.readChar()
