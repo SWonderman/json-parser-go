@@ -1,7 +1,19 @@
 package main
 
-import "fmt"
+import (
+    "fmt"
+
+    "sw/json-parser/jsonparser"
+)
 
 func main() {
-	fmt.Println("Hello, world!")
+    input := `{"name": "Joe"}`
+    parserResult, error := jsonparser.Parse(input)
+    if error != nil {
+        fmt.Println(error.Error())
+    }
+
+    if parserResult.IsSingleMap() {
+        fmt.Printf("For 'name' key got: %s\n", parserResult.SingleMap["name"])
+    }
 }

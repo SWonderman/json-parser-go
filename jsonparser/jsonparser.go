@@ -5,7 +5,7 @@ import (
 	"sw/json-parser/parser"
 )
 
-func Parse(input string) (map[string]any, error) {
+func Parse(input string) (*parser.ParserResult, error) {
     lexer := lexer.New(input)
     parser := parser.New(lexer)
 

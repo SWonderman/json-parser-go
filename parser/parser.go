@@ -1,12 +1,26 @@
 package parser
 
 import (
+    "fmt"
 	"errors"
 	"strconv"
 
 	"sw/json-parser/lexer"
 	"sw/json-parser/token"
 )
+
+type ParserResult struct {
+    SingleMap map[string]any
+    MapArray []any // TODO: any should be map[string]any instead
+}
+
+func (parserResult *ParserResult) IsSingleMap() bool {
+    return parserResult.SingleMap != nil
+}
+
+func (parserResult *ParserResult) IsMapArray() bool {
+    return parserResult.MapArray != nil
+}
 
 type Parser struct {
 	lexer        *lexer.Lexer
@@ -28,9 +42,18 @@ func (parser *Parser) nextToken() {
 	parser.peekToken = parser.lexer.ReadToken()
 }
 
-func (parser *Parser) Parse() (map[string]any, error) {
-	// TODO: check if the first token is '{'
-	return parser.parseObject()
+func (parser *Parser) Parse() (*ParserResult, error) {
+    if parser.currentToken.Literal == token.LBRACE {
+        result, error := parser.parseObject()
+
+        return &ParserResult{SingleMap: result}, error
+    } else if parser.currentToken.Type == token.LSQUARE_BRACE {
+        result, error := parser.parseArray()
+
+        return &ParserResult{MapArray: result}, error
+    }
+
+    return nil, errors.New(fmt.Sprintf("The input has to begin either with '{' or with '['. Found '%s' instead at line: %d and column: %d.", parser.currentToken.Literal, parser.currentToken.Line, parser.currentToken.Column))
 }
 
 func (parser *Parser) parseJson() (any, error) {

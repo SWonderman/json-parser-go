@@ -12,18 +12,22 @@ func TestParserSimpleString(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string]string{
 		"name": "Joe",
 	}
 
 	for key, value := range expectedMap {
-		if parsed[key] != value {
-			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parsed[key])
+		if parserResult.SingleMap[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parserResult.SingleMap[key])
 		}
 	}
 }
@@ -34,18 +38,22 @@ func TestParserSimpleInt(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string]int{
 		"age": 88,
 	}
 
 	for key, value := range expectedMap {
-		if parsed[key] != value {
-			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%d, but got %q->%d", key, value, key, parsed[key])
+		if parserResult.SingleMap[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%d, but got %q->%d", key, value, key, parserResult.SingleMap[key])
 		}
 	}
 }
@@ -56,18 +64,22 @@ func TestParserNegativeInt(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string]int{
 		"age": -88,
 	}
 
 	for key, value := range expectedMap {
-		if parsed[key] != value {
-			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%d, but got %q->%d", key, value, key, parsed[key])
+		if parserResult.SingleMap[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%d, but got %q->%d", key, value, key, parserResult.SingleMap[key])
 		}
 	}
 }
@@ -78,18 +90,22 @@ func TestParserSimpleFloat(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string]float64{
 		"salary": 99.78,
 	}
 
 	for key, value := range expectedMap {
-		if parsed[key] != value {
-			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%f, but got %q->%f", key, value, key, parsed[key])
+		if parserResult.SingleMap[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%f, but got %q->%f", key, value, key, parserResult.SingleMap[key])
 		}
 	}
 }
@@ -100,10 +116,14 @@ func TestParserSimpleStringOnlyObject(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string]string{
 		"first_name": "Joe",
@@ -111,8 +131,8 @@ func TestParserSimpleStringOnlyObject(t *testing.T) {
 	}
 
 	for key, value := range expectedMap {
-		if parsed[key] != value {
-			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parsed[key])
+		if parserResult.SingleMap[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parserResult.SingleMap[key])
 		}
 	}
 }
@@ -123,10 +143,14 @@ func TestParserSimpleIntOnlyObject(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string]int{
 		"age":    88,
@@ -134,8 +158,8 @@ func TestParserSimpleIntOnlyObject(t *testing.T) {
 	}
 
 	for key, value := range expectedMap {
-		if parsed[key] != value {
-			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parsed[key])
+		if parserResult.SingleMap[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parserResult.SingleMap[key])
 		}
 	}
 }
@@ -146,10 +170,14 @@ func TestParserSimpleStringArray(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string][]string{
 		"colors": []string{"blue", "red", "green"},
@@ -157,7 +185,7 @@ func TestParserSimpleStringArray(t *testing.T) {
 
 	for key, value := range expectedMap {
 		colors := value
-		parsedColors := parsed[key]
+		parsedColors := parserResult.SingleMap[key]
 
 		if slice, ok := parsedColors.([]string); ok {
 			for idx, color := range colors {
@@ -175,10 +203,14 @@ func TestParserKeywords(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string]any{
 		"hasKids": false,
@@ -187,8 +219,8 @@ func TestParserKeywords(t *testing.T) {
 	}
 
 	for key, value := range expectedMap {
-		if parsed[key] != value {
-			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parsed[key])
+		if parserResult.SingleMap[key] != value {
+			t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parserResult.SingleMap[key])
 		}
 	}
 }
@@ -199,10 +231,14 @@ func TestParserSimpleObject(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string]any{
 		"name":    "Joe",
@@ -215,16 +251,16 @@ func TestParserSimpleObject(t *testing.T) {
 	}
 
 	for key, value := range expectedMap {
-		if _, ok := parsed[key].([]any); ok {
+		if _, ok := parserResult.SingleMap[key].([]any); ok {
 			// skip checking values that are arrays
 		} else {
-			if parsed[key] != value {
-				t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parsed[key])
+			if parserResult.SingleMap[key] != value {
+				t.Fatalf("Parser returned an unexpected key-value pair. Expected: %q->%q, but got %q->%q", key, value, key, parserResult.SingleMap[key])
 			}
 		}
 	}
 
-	parsedColors, ok := parsed["colors"].([]any)
+	parsedColors, ok := parserResult.SingleMap["colors"].([]any)
 	if ok == false {
 		t.Fatalf("Colors array was not parsed and is missing in the output")
 	}
@@ -247,10 +283,14 @@ func TestParserArrayOfObjects(t *testing.T) {
 	lexer := lexer.New(input)
 	parser := New(lexer)
 
-	parsed, err := parser.Parse()
+	parserResult, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("Parser returned an error. Error: %q", err)
 	}
+
+    if parserResult.IsSingleMap() == false {
+        t.Fatalf("Parser result is not a single map")
+    }
 
 	expectedMap := map[string]any{
 		"orders": []map[string]any{
@@ -265,7 +305,7 @@ func TestParserArrayOfObjects(t *testing.T) {
 		},
 	}
 
-	parsedOrders, ok := parsed["orders"].([]any)
+	parsedOrders, ok := parserResult.SingleMap["orders"].([]any)
 	if ok == false {
 		t.Fatalf("Orders data was not parsed")
 	}
