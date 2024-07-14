@@ -277,7 +277,7 @@ func TestParserSimpleObject(t *testing.T) {
 	}
 }
 
-func TestParserArrayOfObjects(t *testing.T) {
+func TestParserArrayOfNestedObjects(t *testing.T) {
 	input := `{"orders": [{"id": 12, "article": "book"}, {"id": 13, "article": "ball"}]}`
 
 	lexer := lexer.New(input)
@@ -327,4 +327,48 @@ func TestParserArrayOfObjects(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestParserArrayOfObjects(t *testing.T) {
+    input := `[{"name": "Joe"}, {"name": "Kevin"}]`
+
+	lexer := lexer.New(input)
+	parser := New(lexer)
+
+	parserResult, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("Parser returned an error. Error: %q", err)
+	}
+
+    if parserResult.IsMapArray() == false {
+        t.Fatal("Parser result is not a map array")
+    }
+
+	expectedMaps := []map[string]any{
+        {
+            "name":      "Joe",
+        },
+        {
+            "name":      "Kevin",
+        },
+	}
+
+    if len(parserResult.MapArray) != 2 {
+        t.Fatalf("Unexpected amount of objects found inside the map. Expected 2, but got %d", len(parserResult.MapArray))
+    }
+
+    for idx, result := range parserResult.MapArray {
+        resultMap, ok := result.(map[string]any)
+        if ok == false {
+            t.Fatal("Parser result is not a map")
+        }
+        expectedMap := expectedMaps[idx]
+
+        for key, value := range resultMap {
+            if expectedMap[key] != value {
+                t.Fatalf("Result map does not match with the expected map. Got '%s' for key '%s' when %s was expected", expectedMap[key], key, value)
+            }
+        }
+
+    }
 }
