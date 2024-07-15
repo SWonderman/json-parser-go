@@ -54,7 +54,7 @@ func (parser *Parser) Parse() (*ParserResult, error) {
 			return nil, error
 		}
 
-		// NOTE: is there a better way of convering []any to []map[string]any?
+		// NOTE: is there a better way of converting []any to []map[string]any?
 		var mapResult []map[string]any
 		for _, res := range result {
 			conv, ok := res.(map[string]any)
