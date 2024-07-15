@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -24,12 +23,13 @@ func (parserResult *ParserResult) IsMapArray() bool {
 
 type Parser struct {
 	lexer        *lexer.Lexer
+    errorHandler *ErrorHandler
 	currentToken token.Token
 	peekToken    token.Token
 }
 
 func New(lexer *lexer.Lexer) *Parser {
-	parser := Parser{lexer: lexer}
+	parser := Parser{lexer: lexer, errorHandler: &ErrorHandler{}}
 
 	parser.nextToken()
 	parser.nextToken()
@@ -42,35 +42,35 @@ func (parser *Parser) nextToken() {
 	parser.peekToken = parser.lexer.ReadToken()
 }
 
-func (parser *Parser) Parse() (*ParserResult, error) {
+func (parser *Parser) Parse() (*ParserResult, ParserErrors) {
 	if parser.currentToken.Literal == token.LBRACE {
-		result, error := parser.parseObject()
+		result := parser.parseObject()
 
-		return &ParserResult{SingleMap: result}, error
+		return &ParserResult{SingleMap: result}, parser.errorHandler.GetErrors()
 	} else if parser.currentToken.Type == token.LSQUARE_BRACE {
-		result, error := parser.parseArray()
-
-		if error != nil {
-			return nil, error
-		}
+		result := parser.parseArray()
 
 		// NOTE: is there a better way of converting []any to []map[string]any?
 		var mapResult []map[string]any
 		for _, res := range result {
 			conv, ok := res.(map[string]any)
 			if ok == false {
-				return nil, errors.New("Error while converting array of objects into a map. Conversion from 'any' type was not possible.")
+                parser.errorHandler.AddPlainError("Error while converting array of objects into a map. Conversion from 'any' type was not possible.")
+
+				return nil, parser.errorHandler.GetErrors()
 			}
 			mapResult = append(mapResult, conv)
 		}
 
-		return &ParserResult{MapArray: mapResult}, error
+		return &ParserResult{MapArray: mapResult}, parser.errorHandler.GetErrors()
 	}
 
-	return nil, errors.New(fmt.Sprintf("The input has to begin either with '{' or with '['. Found '%s' instead at line: %d and column: %d.", parser.currentToken.Literal, parser.currentToken.Line, parser.currentToken.Column))
+    parser.errorHandler.AddTokenError(fmt.Sprintf("The input has to begin either with '{' or with '[', but got '%s' instead.", parser.currentToken.Literal), &parser.currentToken)
+    
+    return nil, parser.errorHandler.GetErrors()
 }
 
-func (parser *Parser) parseJson() (any, error) {
+func (parser *Parser) parseJson() any {
 	switch parser.currentToken.Type {
 	case token.LBRACE:
 		return parser.parseObject()
@@ -81,32 +81,31 @@ func (parser *Parser) parseJson() (any, error) {
 	case token.NUMBER:
 		return parser.parseNumber()
 	case token.FALSE:
-		return false, nil
+		return false
 	case token.TRUE:
-		return true, nil
+		return true
 	case token.NULL:
-		return nil, nil
+		return nil
 	default:
 		// Handle negative numbers
 		if parser.currentToken.Type == token.MINUS && parser.peekExpected(token.NUMBER) {
 			return parser.parseNegativeNumber()
 		}
 
-		return nil, errors.New("Unknown current token with type: " + string(parser.currentToken.Type) + " and value: " + string(parser.currentToken.Literal))
+        parser.errorHandler.AddTokenError("Unknown token", &parser.currentToken)
+
+        return nil
 	}
 }
 
-func (parser *Parser) parseArray() ([]any, error) {
+func (parser *Parser) parseArray() []any {
 	jsonArr := []any{}
 
 	// consume '['
 	parser.nextToken()
 
 	for parser.currentToken.Type != token.RSQUARE_BRACE {
-		parsedJson, err := parser.parseJson()
-		if err != nil {
-			return nil, err
-		}
+		parsedJson := parser.parseJson()
 
 		jsonArr = append(jsonArr, parsedJson)
 
@@ -119,10 +118,10 @@ func (parser *Parser) parseArray() ([]any, error) {
 		}
 	}
 
-	return jsonArr, nil
+	return jsonArr
 }
 
-func (parser *Parser) parseObject() (map[string]any, error) {
+func (parser *Parser) parseObject() map[string]any {
 	jsonObj := make(map[string]any)
 
 	// consume '{'
@@ -130,7 +129,10 @@ func (parser *Parser) parseObject() (map[string]any, error) {
 
 	for parser.currentToken.Type != token.RBRACE {
 		if parser.currentToken.Type != token.STRING {
-			return nil, errors.New("Key has to be of type string, got: " + string(parser.currentToken.Type))
+
+            parser.errorHandler.AddTokenError("Key value has to be of type string. Did you add quotation marks around the key value?", &parser.currentToken)
+
+            return nil
 		}
 
 		key := parser.currentToken.Literal
@@ -139,16 +141,15 @@ func (parser *Parser) parseObject() (map[string]any, error) {
 		parser.nextToken()
 
 		if parser.currentToken.Type != token.COLON {
-			return nil, errors.New("Key has to be followed by a colon, got: " + string(parser.currentToken.Type))
+            parser.errorHandler.AddTokenError("Key value has to be followed by a colon, but got " + string(parser.currentToken.Type), &parser.currentToken)
+            
+            return nil
 		}
 
 		// consume ':'
 		parser.nextToken()
 
-		value, err := parser.parseJson()
-		if err != nil {
-			return nil, err
-		}
+		value := parser.parseJson()
 
 		jsonObj[key] = value
 
@@ -161,33 +162,30 @@ func (parser *Parser) parseObject() (map[string]any, error) {
 		}
 	}
 
-	return jsonObj, nil
+	return jsonObj
 }
 
-func (parser *Parser) parseString() (string, error) {
-	return parser.currentToken.Literal, nil
+func (parser *Parser) parseString() string {
+	return parser.currentToken.Literal
 }
 
-func (parser *Parser) parseNegativeNumber() (interface{}, error) {
+func (parser *Parser) parseNegativeNumber() interface{} {
 	// consume '-'
 	parser.nextToken()
 
-	parsedValue, error := parser.parseNumber()
-	if error != nil {
-		return nil, error
-	}
+	parsedValue := parser.parseNumber()
 
 	switch val := parsedValue.(type) {
 	case int:
-		return -val, nil
+		return -val
 	case float64:
-		return -val, nil
+		return -val
 	}
 
-	return nil, errors.New("It was not possible to parse a negative number")
+    return nil
 }
 
-func (parser *Parser) parseNumber() (interface{}, error) {
+func (parser *Parser) parseNumber() interface{} {
 	// Try to parse the current token literal as an int first, if that fails,
 	// try to parse it as a float.
 
@@ -195,15 +193,17 @@ func (parser *Parser) parseNumber() (interface{}, error) {
 
 	parsedInt, error := strconv.Atoi(literal)
 	if error == nil {
-		return parsedInt, nil
+		return parsedInt
 	}
 
 	parsedFloat, error := strconv.ParseFloat(literal, 64)
 	if error == nil {
-		return parsedFloat, nil
+		return parsedFloat
 	}
 
-	return nil, errors.New("It was not possible to parse the current token literal as either int or float")
+    parser.errorHandler.AddTokenError("It was not possible to parse the token literal as either int or float.", &parser.currentToken)
+
+    return nil
 }
 
 func (parser *Parser) peekExpected(expectedToken token.TokenType) bool {

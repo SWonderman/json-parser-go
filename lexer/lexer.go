@@ -80,6 +80,7 @@ func (l *Lexer) readKeyword() string {
 func (l *Lexer) readNumber() string {
 	startPos := l.position
 	// NOTE: this will also read and tokenize faulty 'numbers', like: 1.1.1
+    // However, those faulty numbers will get caught by the parser.
 	for l.isCharDigit() || l.currentChar == '.' {
 		l.readChar()
 	}

@@ -6,11 +6,14 @@ import (
 	"sw/json-parser/jsonparser"
 )
 
-func main() {
+func parseArrayOfObjects() {
 	input := `[{"name": "Joe"}, {"name": "Kevin"}]`
-	parserResult, error := jsonparser.Parse(input)
-	if error != nil {
-		fmt.Println(error.Error())
+	parserResult, errors := jsonparser.Parse(input)
+	if errors != nil {
+        for _, err := range errors {
+            fmt.Println(err)
+        }
+        return
 	}
 
 	if parserResult.IsMapArray() {
@@ -20,4 +23,19 @@ func main() {
 			}
 		}
 	}
+}
+
+func main() {
+    input := `{"name": "Joe", "age": -7, "orders": [{"name": "foo", "price": 11.99},]}`
+    result, errors := jsonparser.Parse(input)
+	if errors != nil {
+        for _, err := range errors {
+            fmt.Println(err)
+        }
+        return
+	}
+
+    if result.IsSingleMap() {
+        fmt.Println(result.SingleMap["orders"])
+    }
 }

@@ -358,13 +358,9 @@ func TestParserArrayOfObjects(t *testing.T) {
 	}
 
 	for idx, result := range parserResult.MapArray {
-		resultMap, ok := result.(map[string]any)
-		if ok == false {
-			t.Fatal("Parser result is not a map")
-		}
 		expectedMap := expectedMaps[idx]
 
-		for key, value := range resultMap {
+		for key, value := range result {
 			if expectedMap[key] != value {
 				t.Fatalf("Result map does not match with the expected map. Got '%s' for key '%s' when %s was expected", expectedMap[key], key, value)
 			}
