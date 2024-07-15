@@ -15,7 +15,7 @@ func main() {
 
 	if parserResult.IsMapArray() {
 		for idx, parsedMap := range parserResult.MapArray {
-			for key, value := range parsedMap{
+			for key, value := range parsedMap {
 				fmt.Printf("[%d] %s->%s\n", idx, key, value)
 			}
 		}

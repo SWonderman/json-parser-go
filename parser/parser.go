@@ -50,20 +50,19 @@ func (parser *Parser) Parse() (*ParserResult, error) {
 	} else if parser.currentToken.Type == token.LSQUARE_BRACE {
 		result, error := parser.parseArray()
 
-        if error != nil {
-            return nil, error
-        }
-        
-        // NOTE: is there a better way of convering []any to []map[string]any?
-        var mapResult []map[string]any
-        for _, res := range result {
-            conv, ok := res.(map[string]any)
-            if ok == false {
-                return nil, errors.New("Error while converting array of objects into a map. Conversion from 'any' type was not possible.")
-            }
-            mapResult = append(mapResult, conv) 
-        }
+		if error != nil {
+			return nil, error
+		}
 
+		// NOTE: is there a better way of convering []any to []map[string]any?
+		var mapResult []map[string]any
+		for _, res := range result {
+			conv, ok := res.(map[string]any)
+			if ok == false {
+				return nil, errors.New("Error while converting array of objects into a map. Conversion from 'any' type was not possible.")
+			}
+			mapResult = append(mapResult, conv)
+		}
 
 		return &ParserResult{MapArray: mapResult}, error
 	}
