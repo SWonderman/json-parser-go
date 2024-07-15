@@ -15,12 +15,7 @@ func main() {
 
 	if parserResult.IsMapArray() {
 		for idx, parsedMap := range parserResult.MapArray {
-			result, ok := parsedMap.(map[string]any)
-			if ok == false {
-				fmt.Println("Parser result is not a map when it was expected to be!")
-			}
-
-			for key, value := range result {
+			for key, value := range parsedMap{
 				fmt.Printf("[%d] %s->%s\n", idx, key, value)
 			}
 		}

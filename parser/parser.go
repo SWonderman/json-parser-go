@@ -11,7 +11,7 @@ import (
 
 type ParserResult struct {
 	SingleMap map[string]any
-	MapArray  []any // TODO: any should be map[string]any instead
+	MapArray  []map[string]any
 }
 
 func (parserResult *ParserResult) IsSingleMap() bool {
@@ -50,7 +50,22 @@ func (parser *Parser) Parse() (*ParserResult, error) {
 	} else if parser.currentToken.Type == token.LSQUARE_BRACE {
 		result, error := parser.parseArray()
 
-		return &ParserResult{MapArray: result}, error
+        if error != nil {
+            return nil, error
+        }
+        
+        // NOTE: is there a better way of convering []any to []map[string]any?
+        var mapResult []map[string]any
+        for _, res := range result {
+            conv, ok := res.(map[string]any)
+            if ok == false {
+                return nil, errors.New("Error while converting array of objects into a map. Conversion from 'any' type was not possible.")
+            }
+            mapResult = append(mapResult, conv) 
+        }
+
+
+		return &ParserResult{MapArray: mapResult}, error
 	}
 
 	return nil, errors.New(fmt.Sprintf("The input has to begin either with '{' or with '['. Found '%s' instead at line: %d and column: %d.", parser.currentToken.Literal, parser.currentToken.Line, parser.currentToken.Column))
